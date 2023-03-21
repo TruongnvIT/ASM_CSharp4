@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C#4_Buoi1", "C#4_Buoi1\C#4_Buoi1.csproj", "{30B290AD-3AE6-4F73-A801-78AE8093DD08}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C#4_Buoi1_MVC", "C#4_Buoi1_MVC\C#4_Buoi1_MVC.csproj", "{83561314-4B1F-47F5-80AB-BDA47C713A59}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30B290AD-3AE6-4F73-A801-78AE8093DD08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30B290AD-3AE6-4F73-A801-78AE8093DD08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30B290AD-3AE6-4F73-A801-78AE8093DD08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30B290AD-3AE6-4F73-A801-78AE8093DD08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83561314-4B1F-47F5-80AB-BDA47C713A59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83561314-4B1F-47F5-80AB-BDA47C713A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83561314-4B1F-47F5-80AB-BDA47C713A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83561314-4B1F-47F5-80AB-BDA47C713A59}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E27CCC93-992B-4F99-AE6F-95C6E4959A7F}
+	EndGlobalSection
+EndGlobal

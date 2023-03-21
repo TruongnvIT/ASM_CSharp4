@@ -1,0 +1,53 @@
+﻿@using C_4_Buoi1_MVC.ViewModel;
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model Product
+@{
+    int quantity = 1;
+    var image = Convert.ToBase64String(Model.Image);//Chuyển image -> byte
+    var iduser = HttpContextAccessor.HttpContext.Session.GetString("iduser");
+
+}
+<form>
+<section class="product">
+<input name="Id" hidden value="@Model.Id"/>
+  <div class="product__photo">
+    <img class="photo-container" src="data:image/png;base64,@image"/>
+      <div class="photo-main">
+        <div class="controls" style="position: relative;right: 50px;">
+          <i class="fa-solid fa-fire-flame-curved" style="padding-left:20px;"></i>
+          <i class="fa-regular fa-heart"></i>   
+        </div>    
+    </div>
+  </div>
+  <div class="product__info">
+    <div class="title">
+      <h1>@Model.Name</h1>
+  </div>
+    <div class="price">
+    <span name="Price" value="@Model.Price">@Model.Price</span> USD 
+    </div>
+    <h6>Số lượng</h6>
+    <span class="amount">
+      <span class="value-button" id="decrease" onclick="decreaseValue()" value="Decrease Value">-</span>
+      <input type="number" min="1" name="Quantity" id="number" value="@quantity" />
+      <span class="value-button" id="increase" onclick="increaseValue(@Model.AvailbleQuantity)" value="Increase Value">+</span>
+      <p style="color: gray;display: inherit; padding-left: 10px;">Số lượng khả dụng <span>@Model.AvailbleQuantity</span></p>
+    </span>
+    
+
+    <div class="description">
+      <h6>Mô tả</h6>
+      <div>@Model.Description</div>
+    </div>
+    <a href="/BuyDetail/Buy?idSP=@Model.Id&quantity=@quantity&iduser=@iduser" class="buy--btn" style="background: #0ac80a!important;">
+        <span><i style="font-size: x-large;" class="fa-regular fa-money-bill-1"></i></span>
+        <span>MUA HÀNG</span>
+    </a>
+    <a style="margin: 0 20px" href="/AddCart/AddCart?idSP=@Model.Id&quantity=@quantity&iduser=@iduser" class="buy--btn">
+        <i style="font-size: x-large;" class="fa-solid fa-cart-plus"></i> 
+        <span>THÊM GIỎ HÀNG</span>
+    </a>
+  </div>
+</section>
+</form>

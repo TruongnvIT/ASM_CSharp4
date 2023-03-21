@@ -1,0 +1,67 @@
+﻿@using C_4_Buoi1_MVC.Repositories.IService;
+
+
+@model IEnumerable<C_4_Buoi1_MVC.Models.Bill>
+@inject IBillDetailService _iBillDetail
+
+@{
+    ViewData["Title"] = "GetAll";
+    int stt = 0;
+    var billdetails = _iBillDetail.GetAll();
+}
+
+<h2><i style="margin: 0 10px;" class="fa-solid fa-list"></i>  Danh sách sản phẩm đã mua</h2>
+
+<table style="text-align:center;" class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                STT
+            </th>
+            <th>
+                Thời gian
+            </th>
+            <th>
+                Ngày
+            </th>
+            <th>
+                Tổng tiền
+            </th>
+            <th>
+                Trạng thái
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+                stt++;
+                    <tr data-url="@Url.Action("DetailBuyed", "BuyDetail", new { idbill = item.Id })">
+                <td>
+                    @stt
+                </td>
+                <td>
+                    @item.CreateDate.ToString("HH:mm") 
+                </td>
+                <td>
+                    @item.CreateDate.ToString("MM/dd/yyyy")
+                </td>
+                <td>
+                    @(billdetails.Where(c=>c.IdHD == item.Id).Sum(c=>c.Price)) USD
+                </td>
+                <td>
+                    @(item.Status == 0 ?"Đã thanh toán":"Cập nhật...")
+                </td>
+            </tr>
+        
+        }
+    </tbody>
+</table>
+@section Scripts {
+<script>
+    $("tr").click(function() {
+        var url = $(this).data("url");
+        window.location.href = url;
+    });
+</script>
+}
+

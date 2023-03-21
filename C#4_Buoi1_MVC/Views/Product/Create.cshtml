@@ -1,0 +1,77 @@
+﻿@using C_4_Buoi1_MVC.ViewModel;
+@using C_4_Buoi1_MVC.Component;
+
+@{
+    var productVM = new ProductVM();
+}
+@if (productVM != null)
+{
+    <div class="box-shadow-custom p-3 mb-5 rounded mt-5">
+    <form  asp-controller="Product" asp-action="Create" method="post" enctype="multipart/form-data">
+        <h2 style="text-align: center; margin-bottom: 30px;">Thêm mới sản phẩm</h2>
+        @*@if(ViewBag.Message != null)
+        {
+            <div class="alert alert-success">@ViewBag.Message</div>
+        }*@
+        <div class="row">
+            <div class="col-3">
+                
+                <img id="preview" alt=""style="height:280px;width:300px;margin-bottom: 10px;" 
+                src="https://pkmsawangan.depok.go.id/assets/images/default.jpg" />
+
+                <input class="form-control" asp-for="@productVM.Image" type="file" onchange="previewImage(this);" />                   
+                
+                <span asp-validation-for="@productVM.Image" class="text-danger"  ></span>
+            </div>
+            <div class="col-9 row">
+                <div class="col-6" style="padding: 10px;">
+                       
+                    <div class="form-floating mb-3">
+                        <input maxlength="20" type="text" class="form-control" asp-for="@productVM.Name" >
+                        <label for="tieude">Tên sản phẩm</label>
+                        <span asp-validation-for="@productVM.Name" class="text-danger"  ></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input min="0" type="number" class="form-control" asp-for="@productVM.Price" >
+                        <label for="floatingInput">Giá bán</label>
+                        <span asp-validation-for="@productVM.Price" class="text-danger"  ></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input min="0" type="number" class="form-control" asp-for="@productVM.AvailbleQuantity"  >
+                        <label for="ngaypt">Số lượng</label>
+                        <span asp-validation-for="@productVM.AvailbleQuantity" class="text-danger"  ></span>
+                    </div>                       
+                </div>
+
+                <div class="col-6" style="padding: 10px;">   
+                    <div class="form-floating mb-3">
+                        <input maxlength="50" type="text" class="form-control" asp-for="@productVM.Supplier"  >
+                        <label for="thongtincb">Nhà cung cấp</label>
+                        <span asp-validation-for="@productVM.Supplier" class="text-danger"  ></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select class="form-select" asp-for="@productVM.Status" >
+                            <option value="0" selected>Hoạt động</option>
+                            <option value="1">Đang cập nhật</option>
+                        </select>
+                        <label for="loai">Trạng thái</label>
+                        <span asp-validation-for="@productVM.Status" class="text-danger"  ></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea maxlength="200" style="max-height: 200px;" class="form-control" asp-for="@productVM.Description"  rows="3" ></textarea>
+                        <label for="tomtat">Mô tả</label>
+                        <span asp-validation-for="@productVM.Description" class="text-danger"  ></span>
+                    </div>
+
+                </div>
+                <div style="text-align: center;">
+                    <button type="submit" id="submitBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm mới</button>
+                    <button type="reset" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+}
+

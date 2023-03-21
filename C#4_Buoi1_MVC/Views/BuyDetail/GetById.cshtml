@@ -1,0 +1,63 @@
+﻿@using C_4_Buoi1_MVC.Models
+@using C_4_Buoi1_MVC.Repositories.IService;
+@model IEnumerable<BillDetails>
+@inject IProductService _iProduct
+@inject IBillService _iBill
+@{
+    ViewData["Title"] = "Buy";
+    var products = _iProduct.GetList();
+    var bills = _iBill.GetAll();
+    float totalMoney = 0;
+    int stt = 0;
+}
+
+<div style="text-align: center; align-items: center;">
+    <h2><i class="fa-solid fa-file-invoice"></i> Hóa đơn</h2>
+    <hr />
+    <div class="row">
+
+            <table class="table table-striped-columns">
+                 <thead>
+                    <tr>
+                      <th scope="col">STT </th>
+                      <th scope="col">Ảnh </th>
+                      <th scope="col">Tên sản phẩm </th>
+                      <th scope="col">Thời gian mua</th>
+                      <th scope="col">Số lượng</th>
+                      <th scope="col">Thành tiền</th>
+                    </tr>
+                  </thead>
+                   <tbody>
+                       @foreach (var item in Model)
+                        {
+                            stt++;
+                            totalMoney = totalMoney + item.Price;
+                            var product = products.FirstOrDefault(c => c.Id == item.IdSP);
+                            var bill = bills.FirstOrDefault(c => c.Id == item.IdHD);
+                            var image = Convert.ToBase64String(product.Image);//Chuyển image -> byte
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                  <img id="preview" alt=""style="height:100px;width:120px;margin-bottom: 10px;"src="data:image/png;base64,@image" />
+                                </td>
+                              <td>@product.Name</td>
+                              <td>@bill.CreateDate.ToString("HH:mm") @bill.CreateDate.ToString("MM/dd/yyyy")</td>
+                              <td>@item.Quantity</td>
+                              <td>@item.Price USD</td>
+                            </tr>
+                        }
+                           <tr>
+                               <td colspan="5" class="table-active"><b>Tổng tiền</b></td>
+                                <td><b>@totalMoney USD</b></td>
+
+                           </tr>
+                        
+                     </tbody>
+            </table>
+    </div>
+    <div>
+        <div>
+            <a asp-controller="Product" class="btn btn-outline-primary" asp-action="GetListView">Về trang chủ</a>
+        </div>
+    </div>
+</div>

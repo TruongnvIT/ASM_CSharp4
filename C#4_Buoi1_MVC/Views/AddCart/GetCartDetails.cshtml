@@ -1,0 +1,32 @@
+﻿@model IEnumerable<C_4_Buoi1_MVC.Models.CartDetails>
+
+@{
+    ViewData["Title"] = "GetCartDetails";
+}
+
+<h2><i style="margin: 0 10px;" class="fa-solid fa-list"></i>  Giỏ hàng</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdSP)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
