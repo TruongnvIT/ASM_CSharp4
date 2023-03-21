@@ -1,33 +1,18 @@
 ﻿@using C_4_Buoi1_MVC.Repositories;
 @using C_4_Buoi1_MVC.Repositories.IService;
+@using C_4_Buoi1_MVC.Repositories.Service;
+@using C_4_Buoi1_MVC.ViewModel;
 @using Microsoft.AspNetCore.Http
+@using System.Security.Claims;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
 
 @inject IHttpContextAccessor HttpContextAccessor
-@inject IRoleService roleRep
-@inject IUserService userRep
 @inject ICartDetailService CartDetail
 @{
-    string checkhidden = "";
-    User user = new();
-    List<CartDetails> cartDetails = new();
-    string role = "";
-    var Session = HttpContextAccessor.HttpContext.Session.GetString("iduser");
-    if (Session != "")
-    {
-        user = userRep.GetList().FirstOrDefault(c => c.Id == Guid.Parse(Session));
-        role = roleRep.GetById(user.IdRole).RoleName;
-        cartDetails = CartDetail.GetAll().Where(c=>c.IdUser == Guid.Parse(Session)).ToList();
-    }
-
-  
-    if (role == "Admin")
-    {
-        checkhidden = "unset";
-    }
-    else
-    {
-        checkhidden = "hidden";
-    }
+   var userinfo = HttpContextAccessor.HttpContext.Session.GetObject<GoogleUserInfoVM>("UserLogin");
+   var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("User"); 
+   var cartDetails = CartDetail.GetAll().Where(c=>c.IdUser == user.Id).ToList();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -42,8 +27,6 @@
 
 </head>
 <body>
-    @if (Session != "")
-    {
        <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -59,42 +42,45 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="GetListView">Trang chủ</a>
                         </li>
-                        <li style="content-visibility: @checkhidden;" class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Manager">Quản lý sản phẩm</a>
                         </li>
                     </ul>
                 </div>  
                 <div style="margin-right: 40px;"> 
                    <h4> 
-                        <a asp-area=""  asp-controller="AddCart" asp-action="GetCartDetails" asp-route-iduser="@Session" title="Giỏ hàng" style="margin: 0 20px;">
+                        <a asp-area=""  asp-controller="AddCart" asp-action="GetCartDetails" asp-route-iduser="@user.Id" title="Giỏ hàng" style="margin: 0 20px;">
                             <div class="cart-icon">
                                 <span style="font-size: x-small;top: auto;display: block; bottom: auto;">@cartDetails.Count</span>
                             </div>
                             <i class="fa-solid fa-cart-shopping"></i>
                         </a>
                    
-                       <a title="Lịch sử" asp-area="" asp-controller="BuyDetail" asp-action="GetAll" asp-route-iduser="@Session" >
+                       <a title="Lịch sử" asp-area="" asp-controller="BuyDetail" asp-action="GetAll" asp-route-iduser="@user.Id" >
                             <i class="fa-solid fa-clock-rotate-left"></i>
                        </a>
                    </h4>
                    
                 </div>
-                <div style="margin-right:40px;"> 
-                    <div>
-                        <b>@user.UserName</b>
+                <div class="row col-3">
+                    <div class="col-1"></div>
+                    <img class="col-2" style="margin: 0; padding: 0; border-radius: 50px;" src="@userinfo.Picture" />
+                    <div class="col-9">
+                        <b>@userinfo.Name</b>
+                        <div style="font-size: x-small;">Email: @userinfo.Email</div>
+                        <a type="button" id="Logout" style="text-decoration:none;" asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
                     </div>
-                    <a type="button" id="Logout" style="text-decoration:none;" asp-controller="User" asp-action="Index"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
                 </div>
             </div>
         </nav>
     </header>
-    }  
+     
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-    
+
     <!-- Footer -->
     <footer class="text-center text-lg-start bg-light text-muted">
   <!-- Section: Social media -->
