@@ -19,19 +19,19 @@ namespace C_4_Buoi1_MVC.ViewModel
         public string GivenName { get; set; }
 
         [JsonProperty("family_name")]
-        public string FamilyName { get; set; }
+        public string FamilyName { get; set; } = "";
 
         [JsonProperty("locale")]
-        public string Locale { get; set; }
+        public string Locale { get; set; } = "";
 
         [JsonProperty("gender")]
-        public string Gender { get; set; }
+        public string Gender { get; set; } = "";
 
         [JsonProperty("hd")]
         public string HostedDomain { get; set; }
 
-        [JsonProperty("sub")]
-        public string Subject { get; set; }
+        [JsonProperty("sub")] 
+        public string Subject { get; set; } = "";
 
         [JsonProperty("iat")]
         public long IssuedAt { get; set; }
@@ -39,11 +39,11 @@ namespace C_4_Buoi1_MVC.ViewModel
         [JsonProperty("exp")]
         public long ExpiresAt { get; set; }
 
-        [JsonProperty("azp")]
-        public string AuthorizedParty { get; set; }
+        [JsonProperty("azp")] 
+        public string AuthorizedParty { get; set; } = "";
 
         [JsonProperty("aud")]
-        public string Audience { get; set; }
+        public string Audience { get; set; } = "";
 
         public IEnumerable<Claim> Claims
         {

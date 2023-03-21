@@ -1,6 +1,4 @@
-﻿using C_4_Buoi1_MVC.Data.CShap4DbContext;
-using C_4_Buoi1_MVC.Data.Identity;
-using C_4_Buoi1_MVC.Models;
+﻿using C_4_Buoi1_MVC.Data.Identity;
 using C_4_Buoi1_MVC.Repositories.IService;
 using C_4_Buoi1_MVC.Repositories.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 builder.Services.AddSession(options =>
 {
     // Configure session options here
@@ -68,7 +68,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseSession();
+
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -76,10 +76,10 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseSession();
+app.UseMiddleware<CheckLogOut>();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=User}/{action=Index}");//Trang bắt đầu sau Layout
-    //pattern: "{controller=Account}/{action=Login}");//Trang bắt đầu sau Layout
+    pattern: "{controller=Account}/{action=Login}");//Trang bắt đầu sau Layout
 
 app.Run();

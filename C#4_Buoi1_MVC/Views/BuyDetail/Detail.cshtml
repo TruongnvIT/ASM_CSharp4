@@ -1,11 +1,13 @@
-﻿@using C_4_Buoi1_MVC.ViewModel;
+﻿@using C_4_Buoi1_MVC.Repositories.Service;
+@using C_4_Buoi1_MVC.ViewModel;
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @model Product
 @{
     int quantity = 1;
     var image = Convert.ToBase64String(Model.Image);//Chuyển image -> byte
-    var iduser = HttpContextAccessor.HttpContext.Session.GetString("iduser");
+       var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("User"); 
+
 
 }
 <form>
@@ -40,11 +42,11 @@
       <h6>Mô tả</h6>
       <div>@Model.Description</div>
     </div>
-    <a href="/BuyDetail/Buy?idSP=@Model.Id&quantity=@quantity&iduser=@iduser" class="buy--btn" style="background: #0ac80a!important;">
+    <a href="/BuyDetail/Buy?idSP=@Model.Id&quantity=@quantity&iduser=@user.Id" class="buy--btn" style="background: #0ac80a!important;">
         <span><i style="font-size: x-large;" class="fa-regular fa-money-bill-1"></i></span>
         <span>MUA HÀNG</span>
     </a>
-    <a style="margin: 0 20px" href="/AddCart/AddCart?idSP=@Model.Id&quantity=@quantity&iduser=@iduser" class="buy--btn">
+    <a style="margin: 0 20px" href="/AddCart/AddCart?idSP=@Model.Id&quantity=@quantity&iduser=@user.Id" class="buy--btn">
         <i style="font-size: x-large;" class="fa-solid fa-cart-plus"></i> 
         <span>THÊM GIỎ HÀNG</span>
     </a>
