@@ -1,6 +1,5 @@
 ﻿@using C_4_Buoi1_MVC.Repositories.Service;
 @using Microsoft.AspNetCore.Http
-@using C_4_Buoi1_MVC.Component
 
 @inject IHttpContextAccessor HttpContextAccessor
 
@@ -8,7 +7,7 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Product Page";
-    var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("User"); 
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("user"); 
     var test = HttpContextAccessor.HttpContext.Session.GetString("iduser");
 }
 @model IEnumerable<Product>

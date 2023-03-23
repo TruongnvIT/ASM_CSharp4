@@ -3,6 +3,7 @@ using C_4_Buoi1_MVC.Repositories;
 using C_4_Buoi1_MVC.Repositories.IService;
 using C_4_Buoi1_MVC.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace C_4_Buoi1_MVC.Controllers
 {
@@ -24,24 +25,23 @@ namespace C_4_Buoi1_MVC.Controllers
 
         public IActionResult GetAll(string iduser)
         {
-            return View(_ibill.GetAll().Where(c => c.UserId == Guid.Parse(iduser)).OrderByDescending(c=>c.CreateDate));
+            return View(_ibill.GetAll().Where(c => c.UserId == Guid.Parse(iduser)).OrderByDescending(c => c.CreateDate));
         }
 
         public IActionResult GetById(Guid id)
-        {            
-            return View(_ibillDetail.GetAll().Where(c=>c.IdHD == id));
+        {
+            return View(_ibillDetail.GetAll().Where(c => c.IdHD == id));
         }
 
         public IActionResult Buy(Guid idSP, int quantity, string iduser)
         {
             var newidbill = Guid.NewGuid();
             var product = _iProduct.GetList().FirstOrDefault(c => c.Id == idSP);
-            var createdate = DateTime.Now;
 
             Bill bill = new Bill
             {
                 Id = newidbill,
-                CreateDate = createdate,
+                CreateDate = DateTime.Now,
                 UserId = Guid.Parse(iduser),
                 Status = 0
             };
@@ -61,7 +61,7 @@ namespace C_4_Buoi1_MVC.Controllers
                 if (resutldt)
                 {
                     product.AvailbleQuantity = product.AvailbleQuantity - quantity;
-                    resutlpro = _iProduct.Update(product);                    
+                    resutlpro = _iProduct.Update(product);
                 }
                 if (resutldt && resutlpro)
                 {
@@ -72,8 +72,53 @@ namespace C_4_Buoi1_MVC.Controllers
             return View(_iProduct.GetList().FirstOrDefault(c => c.Id == idSP));
         }
 
+        public IActionResult BuyList(string jsonList)
+        {
+            var cartDetails = JsonConvert.DeserializeObject<List<CartDetails>>(jsonList);
+            var newidbill = Guid.NewGuid();
+            var iduser = cartDetails.FirstOrDefault().IdUser;
+            try
+            {
+                Bill bill = new Bill
+                {
+                    Id = newidbill,
+                    CreateDate = DateTime.Now,
+                    UserId = iduser,
+                    Status = 0
+                };
+                var resutl = _ibill.Create(bill);
+                if (resutl)
+                {
+                    foreach (var item in cartDetails)
+                    {
+                        var product = _iProduct.GetList().FirstOrDefault(c => c.Id == item.IdSP);
+                        BillDetails billDetails = new BillDetails
+                        {
+                            Id = Guid.NewGuid(),
+                            IdSP = item.IdSP,
+                            IdHD = newidbill,
+                            Price = product.Price,
+                            Quantity = item.Quantity
+                        };
+                        var resutldt = _ibillDetail.Create(billDetails);
+                        if (resutldt)
+                        {
+                            product.AvailbleQuantity = product.AvailbleQuantity - item.Quantity;
+                            _iProduct.Update(product);
+                        }
+                    }
+                    return View("DetailBuyed", _ibillDetail.GetAll().Where(c => c.IdHD == newidbill));
+                }
+                return RedirectToAction("GetCartDetails", "AddCart", iduser);
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("GetCartDetails", "AddCart", iduser);
+            }
+        }
+
         public IActionResult DetailBuyed(Guid idbill)
-        {            
+        {
             return View(_ibillDetail.GetAll().Where(c => c.IdHD == idbill));
         }
 

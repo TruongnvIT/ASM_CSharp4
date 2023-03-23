@@ -1,32 +1,120 @@
-﻿@model IEnumerable<C_4_Buoi1_MVC.Models.CartDetails>
+﻿@using C_4_Buoi1_MVC.Repositories.IService;
+@using C_4_Buoi1_MVC.Repositories.Service;
+@using C_4_Buoi1_MVC.ViewModel;
+@using System.Web
+
+@model IEnumerable<C_4_Buoi1_MVC.Models.CartDetails>
+
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IProductService _iProduct
+@inject ICartDetailService _iCartDetail
 
 @{
-    ViewData["Title"] = "GetCartDetails";
+    ViewData["Title"] = "Giỏ hàng";
+    var products = _iProduct.GetList();
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("user");
+    float totalMoney = 0;
+    int quantityValue = 0;
+    List<CartDetails> cartDetails = new();
 }
 
-<h2><i style="margin: 0 10px;" class="fa-solid fa-list"></i>  Giỏ hàng</h2>
+<h2><i style="margin: 0 10px;" class="fa-solid fa-basket-shopping"></i>  Giỏ hàng</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IdSP)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdSP)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<html class="html" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Basket</title>
+</head>
+
+<body class="body">
+  <form method="post" action="/BuyDetail/BuyList">
+      <main class="main">
+    <div class="basket">
+      <div class="basket-labels ">
+        <table class="table">
+  <thead>
+    <tr class="row" style="text-align: center;">
+      <th class="col-3">Ảnh sản phẩm</th>
+      <th class="col-3">Tên sản phẩm</th>
+      <th class="col-3">Giá tiền</th>
+      <th class="col-1"></th>
+      <th class="col-2">Tổng giá</th>
+    </tr>
+  </thead>
+  </table>
+      </div>
+      @foreach (var item in Model)
+    {
+        var product = products.FirstOrDefault(c => c.Id == item.IdSP);
+        var image = Convert.ToBase64String(product.Image);//Chuyển image -> byte
+        totalMoney = totalMoney + (item.Quantity * product.Price);
+        <div class="basket-product">
+    <div class="item">
+        <div class="remove">
+        <a asp-controller="AddCart" asp-action="RemoveCartDetail" asp-route-id="@item.Id" asp-route-iduser="@user.Id" ><i class="fa-solid fa-square-xmark"></i></a>
+    </div>
+        <div class="product-image">
+        <img src="data:image/png;base64,@image" alt="Placholder Image 2" class="product-frame custom-img">
+        </div>
+        <div class="product-details">
+        <h5><strong ><span class="item-quantity">@item.Quantity</span> x @product.Name</strong></h5>
+        <p style="color: gray;display: inherit;">Số lượng khả dụng <span>@product.AvailbleQuantity</span></p>
+        <p><strong>NCC: @product.Supplier</strong></p>
+        </div>
+    </div>
+    <div class="price-cart">@product.Price  USD x <span> </span></div>
+    <span class="amount quantity" style="margin-left: 5px;">
+        <span class="value-button1" id="decrease" onclick="decreaseValue1('@item.Id')" value="Decrease Value">-</span>
+        <input id="@item.Id" style="width: 30px!important; height: 20px!important;text-align:center;" type="number" value="@item.Quantity" disabled />
+        <span class="value-button1" id="increase" onclick="increaseValue1('@item.Id',@product.AvailbleQuantity)" value="Increase Value">+</span>
+    </span>
+    <div class="subtotal">@(item.Quantity * product.Price)</div> USD
+    </div>        
+    }  
+ 
+    <script type="text/javascript">
+    function getQuantity() {
+        var quantity = document.getElementById("number").value;
+        return quantity;
+    }
+    function buyClick() {
+        var cartDetails = [];
+
+        @foreach (var item in Model) {
+            <text>
+            var item = @Html.Raw(Json.Serialize(item));
+            item.Quantity = document.getElementById("@item.Id").value;
+            cartDetails.push(item);
+            </text>
+        }
+
+        var cartDetailsJson = JSON.stringify(cartDetails);
+
+        return cartDetailsJson;
+    }
+    </script>
+    </div>
+    <aside>
+      <div class="summary">
+        <div class="summary-total-items"><span class="total-items"></span> Sản phẩm trong Giỏ hàng</div>
+        <div class="summary-total">
+          <div class="total-title">Tổng tiền</div>
+          <div class="total-value final-value" style="width: 39%!important" id="basket-total">@totalMoney</div> <span style="float: left;width: 10%;">USD</span>
+        </div>       
+        <div class="summary-checkout" >
+       <a href="/BuyDetail/BuyList?jsonList="onclick="this.href += buyClick()"id="buy-link"class="checkout-cta custom-button button"@(totalMoney > 0 ? "": "hidden")>
+        <i style="font-size: x-large;" class="fa-regular fa-credit-card"></i> 
+        <span>MUA HÀNG</span>
+        </a>
+        </div>
+        
+      </div>
+    </aside>
+  </main>
+  </form>
+</body>
+
+</html>

@@ -10,10 +10,11 @@
     var billdetails = _iBillDetail.GetAll();
 }
 
-<h2><i style="margin: 0 10px;" class="fa-solid fa-list"></i>  Danh sách sản phẩm đã mua</h2>
+<h2><i style="margin: 0 10px;" class="fa-solid fa-clock-rotate-left"></i>  Danh sách sản phẩm đã mua</h2>
 
-<table style="text-align:center;" class="table table-hover">
-    <thead>
+<div class="box-shadow-custom" style="padding: 30px;">
+    <table class="table table-bordered" style="text-align: center; top: auto!important; bottom: auto!important;">
+    <thead style="background-color: rgb(240 253 255);">
         <tr>
             <th>
                 STT
@@ -56,6 +57,7 @@
         }
     </tbody>
 </table>
+</div>
 @section Scripts {
 <script>
     $("tr").click(function() {

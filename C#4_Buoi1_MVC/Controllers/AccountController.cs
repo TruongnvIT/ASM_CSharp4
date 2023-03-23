@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 using C_4_Buoi1_MVC.Repositories.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Collections.Generic;
+using System.Security.Claims;
+
 
 namespace C_4_Buoi1_MVC.Controllers
 {
@@ -18,43 +17,47 @@ namespace C_4_Buoi1_MVC.Controllers
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
         private readonly IUserService _userService;
         private readonly IUserService _iUser;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<AccountController> logger, IUserService userService, IUserService iUser)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AccountController> logger, IUserService userService, IUserService iUser)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _userService = userService;
             _iUser = iUser;
+            _roleManager = roleManager;
         }
 
         public IActionResult Login()
         {
-            HttpContext.Session.SetString("iduser", "");
+            //HttpContext.Session.SetString("iduser", "");
             return View();
         }
 
 
-        [HttpPost]
-        public IActionResult Login(string username, string password)
-        {
-            var users = _iUser.GetList();
-            var user = users.FirstOrDefault(c => c.UserName == username && c.Password == password);
-            if (user != null)
-            {
-                HttpContext.Session.SetString("iduser", user.Id.ToString());
-                return RedirectToAction("GetListView", "Product");
-            }
-            ViewBag.ToastMessage = "Thông báo đã được hiển thị!";
-            return RedirectToAction("Index");
-        }
+        //[HttpPost]
+        //public IActionResult Login(string username, string password)
+        //{
+        //    var users = _iUser.GetList();
+        //    var user = users.FirstOrDefault(c => c.UserName == username && c.Password == password);
+        //    if (user != null)
+        //    {
+        //        HttpContext.Session.SetString("iduser", user.Id.ToString());
+        //        return RedirectToAction("GetListView", "Product");
+        //    }
+        //    ViewBag.ToastMessage = "Thông báo đã được hiển thị!";
+        //    return RedirectToAction("Index");
+        //}
 
         public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Session.Clear();
+
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
@@ -92,6 +95,8 @@ namespace C_4_Buoi1_MVC.Controllers
                         UserName = userinfo.Email,
                     };
                     var adduser = await _userManager.CreateAsync(identityUser);
+
+                    var addroleforuser = await _userManager.AddToRoleAsync(identityUser, "USER");
                     if (adduser.Succeeded)
                     {
                         User user = new User()
@@ -104,15 +109,27 @@ namespace C_4_Buoi1_MVC.Controllers
                         _userService.Create(user);
                     }
                 }
+                var userIdentity = await _userManager.FindByEmailAsync(userinfo.Email);
+                var roles = await _userManager.GetRolesAsync(userIdentity);
+                var claims = new List<Claim>();
+                
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));                
+                
                 if (await _userManager.FindByEmailAsync(userinfo.Email) != null)
                 {
                     HttpContext.Session.SetObject("UserLogin", userinfo); // lưu đối tượng vào session với key là "User"
-                    var iduser = _iUser.GetList().FirstOrDefault(c => c.UserName == userinfo.Email);
-                    HttpContext.Session.SetObject("User", iduser);
+                    var user = _iUser.GetList().FirstOrDefault(c => c.UserName == userinfo.Email);
+                    HttpContext.Session.SetObject("user", user);
                     return RedirectToAction("GetListView", "Product");
                 }
             }
-            return RedirectToAction("Index", "User");
+            return RedirectToAction("Login", "Account");
         }
 
         private async Task<GoogleUserInfoVM> GetGoogleUserInfoAsync(string accessToken)

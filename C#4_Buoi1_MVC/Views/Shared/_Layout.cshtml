@@ -6,12 +6,14 @@
 @using System.Security.Claims;
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "ADMIN,STAFF,USER")]
 
 @inject IHttpContextAccessor HttpContextAccessor
 @inject ICartDetailService CartDetail
 @{
    var userinfo = HttpContextAccessor.HttpContext.Session.GetObject<GoogleUserInfoVM>("UserLogin");
-   var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("User"); 
+   var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("user"); 
    var cartDetails = CartDetail.GetAll().Where(c=>c.IdUser == user.Id).ToList();
 }
 <!DOCTYPE html>
@@ -37,17 +39,33 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div style="font-weight: 500;" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div style="font-weight: 500;font-size: larger;" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="GetListView">Trang chủ</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="GetListView"><i class="fa-solid fa-house"></i> Trang chủ</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Manager">Quản lý sản phẩm</a>
-                        </li>
+                         @*<AuthorizeView Roles="ADMIN">
+                            <Authorized>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Manager"><i class="fa-solid fa-list-check"></i> Quản lý sản phẩm</a>
+                                </li>
+                            </Authorized>
+                        </AuthorizeView>*@
+                        @if (User.IsInRole("ADMIN") || User.IsInRole("STAFF"))
+                        {
+                             <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Manager"> Quản lý sản phẩm</a>
+                            </li>             
+                        }
+                        @if (User.IsInRole("ADMIN"))
+                        {
+                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="RoleForUser" asp-action="ManagerRoleUser"> Phân quyền</a>
+                            </li>
+                        }
                     </ul>
                 </div>  
-                <div style="margin-right: 40px;"> 
+                <div style="margin-right: 20px;"> 
                    <h4> 
                         <a asp-area=""  asp-controller="AddCart" asp-action="GetCartDetails" asp-route-iduser="@user.Id" title="Giỏ hàng" style="margin: 0 20px;">
                             <div class="cart-icon">
@@ -62,13 +80,13 @@
                    </h4>
                    
                 </div>
-                <div class="row col-3">
+                <div class="row col-2">
                     <div class="col-1"></div>
-                    <img class="col-2" style="margin: 0; padding: 0; border-radius: 50px;" src="@userinfo.Picture" />
+                    <img class="col-2" style="margin-top: 10px; padding: 0; border-radius: 50px; width: 15%; height: 15%;" src="@userinfo.Picture" />
                     <div class="col-9">
-                        <b>@userinfo.Name</b>
+                        <b>@userinfo.GivenName</b>
                         <div style="font-size: x-small;">Email: @userinfo.Email</div>
-                        <a type="button" id="Logout" style="text-decoration:none;" asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                        <a type="button" id="Logout" style="text-decoration:none; font-size: small;" asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
                     </div>
                 </div>
             </div>

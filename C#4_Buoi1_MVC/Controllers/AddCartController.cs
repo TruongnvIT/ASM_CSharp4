@@ -16,47 +16,57 @@ namespace C_4_Buoi1_MVC.Controllers
             _iCart = iCart;
             _iCartDetail = iCartDetail;
         }
-        public IActionResult AddCart(Guid idSP, int quantity, string iduser)
+        public IActionResult AddCart(Guid idSP, int quantity, Guid iduser)
         {
+            var product = _iProduct.GetList().FirstOrDefault(c => c.Id == idSP);
 
-            if (!_iCart.GetAll().Any(c => c.IdUser == Guid.Parse(iduser)))
+            if (!_iCart.GetAll().Any(c => c.IdUser == iduser))
             {
                 Cart cart = new Cart()
                 {
-                    IdUser = Guid.Parse(iduser)
+                    IdUser = iduser
                 };
                 var resutl = _iCart.Create(cart);
             }
 
             bool resutldt;
-            if (!_iCartDetail.GetAll().Any(c => c.IdSP == idSP && c.IdUser == Guid.Parse(iduser)))
+            if (!_iCartDetail.GetAll().Any(c => c.IdSP == idSP && c.IdUser == iduser))
             {
                 CartDetails cartDetails = new CartDetails()
                 {
                     Id = Guid.NewGuid(),
                     IdSP = idSP,
                     Quantity = quantity,
-                    IdUser = Guid.Parse(iduser)
+                    IdUser = iduser
                 };
                 resutldt = _iCartDetail.Create(cartDetails);
             }
             else
             {
-                var cartdetail = _iCartDetail.GetAll().FirstOrDefault(c => c.IdSP == idSP && c.IdUser == Guid.Parse(iduser));
+                var cartdetail = _iCartDetail.GetAll().FirstOrDefault(c => c.IdSP == idSP && c.IdUser == iduser);
                 cartdetail.Quantity = cartdetail.Quantity + quantity;
                 resutldt = _iCartDetail.Update(cartdetail);
             }
-
-            if (resutldt)
-            {
+            product.AvailbleQuantity = product.AvailbleQuantity - quantity;
+            var resutlpro = _iProduct.Update(product);
+            if (resutldt && resutlpro)
+            { 
                 return RedirectToAction("GetListView", "Product");
             }
             return RedirectToAction($"BuyDetail/Detail/{idSP}&{quantity}&{iduser}");
         }
 
-        public IActionResult GetCartDetails(string iduser)
+        public IActionResult GetCartDetails(Guid iduser)
         {
-            return View(_iCartDetail.GetAll().Where(c => c.IdUser == Guid.Parse(iduser)));
+            return View(_iCartDetail.GetAll().Where(c => c.IdUser == iduser));
+        }
+
+        public IActionResult RemoveCartDetail(Guid id, Guid iduser)
+        {
+            _iCartDetail.Delete(id);
+
+            return RedirectToAction("GetCartDetails", iduser);
+
         }
     }
 }

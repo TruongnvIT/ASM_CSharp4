@@ -27,15 +27,11 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 }
 )
     //.AddOpenIdConnect("oidc", options =>
@@ -46,8 +42,16 @@ builder.Services.AddAuthentication(options =>
     //    options.RemoteSignOutPath = "/signout-google";
     //    options.SignedOutRedirectUri = "/";
     //})
-    
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.Cookie.Name = "CookieForTruong";
+        options.LoginPath = "/Account/Login";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Thiết lập chính sách bảo mật
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Thiết lập thời gian sống của cookie
+        options.SlidingExpiration = true; // Cho phép cookie được cập nhật thời gian sống mỗi khi có request mới
+        options.Cookie.HttpOnly = true;
+    })
        .AddGoogle(options =>
        {
            IConfigurationSection googleAuthNSection =
@@ -59,25 +63,45 @@ builder.Services.AddAuthentication(options =>
            options.SaveTokens = true;
        });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => { policy.RequireAuthenticatedUser(); policy.RequireRole("ADMIN"); });
+    options.AddPolicy("RequireStaffRole", policy => { policy.RequireAuthenticatedUser(); policy.RequireRole("STAFF"); });
+    options.AddPolicy("RequireUserRole", policy => { policy.RequireAuthenticatedUser(); policy.RequireRole("USER"); });
+});
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-app.UseHttpsRedirection();
-app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); // sử dụng CORS sau phương thức UseRouting
+
+app.UseHttpsRedirection(); // sử dụng HTTPS redirection sau phương thức UseCors
+
+app.UseStaticFiles();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 app.UseMiddleware<CheckLogOut>();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}");//Trang bắt đầu sau Layout

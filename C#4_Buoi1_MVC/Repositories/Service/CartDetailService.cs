@@ -29,7 +29,18 @@ namespace C_4_Buoi1_MVC.Repositories.Service
 
         public bool Delete(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var resutl = _context.CartDetails.FirstOrDefault(c => c.Id == id);
+                _context.CartDetails.Remove(resutl);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+
+            }
         }
 
         public List<CartDetails> GetAll()
