@@ -1,12 +1,14 @@
 ﻿using C_4_Buoi1_MVC.Models;
-using C_4_Buoi1_MVC.Repositories;
 using C_4_Buoi1_MVC.Repositories.IService;
 using C_4_Buoi1_MVC.ViewModel;
-using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Data;
 
 namespace C_4_Buoi1_MVC.Controllers
 {
+    //[Authorize]
     public class ProductController : Controller
     {
         private readonly IProductService _iProduct;
@@ -24,8 +26,11 @@ namespace C_4_Buoi1_MVC.Controllers
         {            
             return View(_iProduct.GetList().Where(c=>c.AvailbleQuantity > 0 && c.Status == 0));
         }
+
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Manager()
         {
+            var a = User;
             return View(_iProduct.GetList());
         }
 

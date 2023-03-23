@@ -6,9 +6,7 @@
 @{
     int quantity = 1;
     var image = Convert.ToBase64String(Model.Image);//Chuyển image -> byte
-       var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("User"); 
-
-
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<User>("user"); 
 }
 <form>
 <section class="product">
@@ -42,11 +40,14 @@
       <h6>Mô tả</h6>
       <div>@Model.Description</div>
     </div>
-    <a href="/BuyDetail/Buy?idSP=@Model.Id&quantity=@quantity&iduser=@user.Id" class="buy--btn" style="background: #0ac80a!important;">
-        <span><i style="font-size: x-large;" class="fa-regular fa-money-bill-1"></i></span>
-        <span>MUA HÀNG</span>
-    </a>
-    <a style="margin: 0 20px" href="/AddCart/AddCart?idSP=@Model.Id&quantity=@quantity&iduser=@user.Id" class="buy--btn">
+    <a href="/BuyDetail/Buy?idSP=@Model.Id&quantity="onclick="this.href += getQuantity() + '&iduser=@user.Id';" class="buy--btn" id="buy-link" style="background: #0ac80a!important;"><i style="font-size: x-large;" class="fa-regular fa-credit-card"></i> MUA HÀNG</a>
+    <script type="text/javascript">
+        function getQuantity() {
+            var quantity = document.getElementById("number").value;
+            return quantity;
+        }
+    </script>
+    <a style="margin: 0 20px" href="/AddCart/AddCart?idSP=@Model.Id&quantity="onclick="this.href += getQuantity() + '&iduser=@user.Id';"id="buy-link" class="buy--btn">
         <i style="font-size: x-large;" class="fa-solid fa-cart-plus"></i> 
         <span>THÊM GIỎ HÀNG</span>
     </a>

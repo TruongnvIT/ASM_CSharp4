@@ -1,0 +1,27 @@
+﻿@model C_4_Buoi1_MVC.ViewModel.UserRoleAspNetVM
+
+@{
+    ViewData["Title"] = "UpdateRoleUserView";
+    string check = "";
+    if (Model.Roles.FirstOrDefault() == "STAFF")
+    {
+        check = "checked";
+    }  
+}
+
+<h2>Cấp quyền cho người dùng</h2>
+    
+<form asp-action="UpdateRoleUserView">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <label asp-for="Email" class="control-label"><b>Quyền người dùng: @Model.Email</b></label>
+    <hr style="width: 20%;"/>
+    @*@foreach (var role in Model.Roles)//Hiện tại mỗi người chỉ cho 1 quyền 
+    {
+        <input type="checkbox" class="form-control" value="@role"/>
+    }*@
+    <input id="myCheckbox" type="checkbox" @check/>
+    <label for="role">STAFF</label> <br/>
+    <a style="margin-top: 40px;" href="/RoleForUser/UpdateRoleUser?id=@Model.Id&role="onclick="this.href += checkCheckbox()" type="button" class="btn btn-primary">Cấp quyền</a>
+</form>
+
+

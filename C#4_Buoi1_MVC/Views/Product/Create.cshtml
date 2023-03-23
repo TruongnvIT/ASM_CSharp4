@@ -1,5 +1,4 @@
 ﻿@using C_4_Buoi1_MVC.ViewModel;
-@using C_4_Buoi1_MVC.Component;
 
 @{
     var productVM = new ProductVM();
@@ -66,7 +65,7 @@
 
                 </div>
                 <div style="text-align: center;">
-                    <button type="submit" id="submitBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm mới</button>
+                    <button type="submit" onclick="NotificationBuy()" id="submitBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm mới</button>
                     <button type="reset" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
                 </div>
             </div>
